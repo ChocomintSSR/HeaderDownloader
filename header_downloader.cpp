@@ -8,7 +8,12 @@
 #include <QFile>
 #include <QDebug>
 #include <QFileDialog>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QMessageBox>
+#include <QJsonArray>
 QString path = "undefined";
+QJsonObject current_headers_data;
 
 QByteArray getData_fromURL(QString url)
 {
@@ -32,9 +37,28 @@ header_downloader::header_downloader(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::header_downloader)
 {
+    // initialize here //
     ui->setupUi(this);
-    qDebug()<<QSslSocket::sslLibraryBuildVersionString();
-    //這裡是初始化的地方
+    //當你要處理ui物件 就必須在setupUi之後處理 否則Qt會崩潰
+
+//    int obj_x = ui->banner->width();
+//    int obj_y = ui->banner->height();
+//    ui->banner->setPixmap(QPixmap(":/icons/background.png").scaled(obj_x,obj_y));
+
+    QByteArray file_content = getData_fromURL("https://raw.githubusercontent.com/ChocomintSSR/HeaderDownloader/master/sys/file_index");
+    if (file_content == "file download failed")
+    {
+        QMessageBox::warning(this,"Header Downloader - Error!","Application start failed\n[program can't access internet]");
+        exit(0); //停止所有Qt的東西 並且在main.cpp內回傳0 關閉程式
+    }
+    else
+    {
+        current_headers_data = QJsonDocument::fromJson(file_content).object();
+        QJsonArray headers_data = current_headers_data.value("list_of_headers").toArray();
+        for (int i = 0; i < headers_data.size(); i++)
+            ui->header_select->addItem(headers_data.at(i).toObject().value("name").toString());
+    }
+
     // int obj_x = ui->header_icon->width();
     // int obj_y = ui->header_icon->height();
     // ui->header_icon->setPixmap(QPixmap(":/icons/h2.png").scaled(obj_x,obj_y,Qt::KeepAspectRatio));
@@ -47,13 +71,15 @@ header_downloader::~header_downloader()
 
 void header_downloader::on_download_clicked()
 {
-    if (path == "undefined"){
+    if (path == "undefined" || path == "\0")
+    {
         ui->status->setText("You haven't chosen the folder.");
         return;
     }
+
     QString header_type = ui->header_select->currentText();
     QString PATH = path + "\\" + header_type;
-    QString URL = "https://raw.githubusercontent.com/ChocomintSSR/Header_forCpp/main/" + header_type;
+    QString URL = current_headers_data.value("root_url").toString()+ header_type;
     ui->status->setText("downloading...");
 
     // write data into file by QFile
