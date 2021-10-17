@@ -1,0 +1,1 @@
+{"list_of_headers":[{"name":"BigNumber.h"}, {"name":"Graph.h"}, {"name":"Matrix.h"}, {"name":"complex.h"}, {"name":"formula.h"}, {"name":"stringEX.h"}],"root_url":"https://raw.githubusercontent.com/ChocomintSSR/Header_forCpp/main/"}
