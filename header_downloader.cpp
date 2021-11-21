@@ -29,8 +29,10 @@ QByteArray getData_fromURL(QString url)
 
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) // 200 == accept
         return reply->readAll();
-    else
+    else{
+        qDebug()<<reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         return QByteArray("file download failed");
+    }
 }
 
 header_downloader::header_downloader(QWidget *parent)
@@ -45,7 +47,7 @@ header_downloader::header_downloader(QWidget *parent)
 //    int obj_y = ui->banner->height();
 //    ui->banner->setPixmap(QPixmap(":/icons/background.png").scaled(obj_x,obj_y));
 
-    QByteArray file_content = getData_fromURL("https://raw.githubusercontent.com/ChocomintSSR/HeaderDownloader/master/sys/file_index");
+    QByteArray file_content = getData_fromURL("https://raw.githubusercontent.com/ChocomintSSR/HeaderDownloader/master/resource/file_index");
     if (file_content == "file download failed")
     {
         QMessageBox::warning(this,"Header Downloader - Error!","Application start failed!\n[Program cannot access the Internet]");
@@ -54,9 +56,9 @@ header_downloader::header_downloader(QWidget *parent)
     else
     {
         current_headers_data = QJsonDocument::fromJson(file_content).object();
-        QJsonArray headers_data = current_headers_data.value("list_of_headers").toArray();
-        for (int i = 0; i < headers_data.size(); i++)
-            ui->header_select->addItem(headers_data.at(i).toObject().value("name").toString());
+        QJsonArray headers_list = current_headers_data.value("headers_list").toArray();
+        for (int i = 0; i < headers_list.size(); i++)
+            ui->header_select->addItem(headers_list.at(i).toObject().value("name").toString());
     }
 
     // int obj_x = ui->header_icon->width();
@@ -79,7 +81,8 @@ void header_downloader::on_download_clicked()
 
     QString header_type = ui->header_select->currentText();
     QString PATH = path + "\\" + header_type;
-    QString URL = current_headers_data.value("root_url").toString()+ header_type;
+
+    QString URL = current_headers_data.value("root_url").toString()+ header_type; //
     ui->status->setText("downloading...");
 
     // write data into file by QFile
