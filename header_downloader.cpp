@@ -27,7 +27,7 @@ QByteArray getData_fromURL(QString url)
     QNetworkReply *reply = mgr.get(request);
     event_loop.exec();
 
-    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()==200)
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) // 200 == accept
         return reply->readAll();
     else
         return QByteArray("file download failed");
@@ -48,7 +48,7 @@ header_downloader::header_downloader(QWidget *parent)
     QByteArray file_content = getData_fromURL("https://raw.githubusercontent.com/ChocomintSSR/HeaderDownloader/master/sys/file_index");
     if (file_content == "file download failed")
     {
-        QMessageBox::warning(this,"Header Downloader - Error!","Application start failed\n[program can't access internet]");
+        QMessageBox::warning(this,"Header Downloader - Error!","Application start failed!\n[Program cannot access the Internet]");
         exit(0); //停止所有Qt的東西 並且在main.cpp內回傳0 關閉程式
     }
     else
@@ -91,7 +91,7 @@ void header_downloader::on_download_clicked()
     file->resize(file->pos()); //因為qt是overwrite 如果原先檔案比現在寫入的資料還要長 他就不會把後面的蓋掉 所以你要幫檔案整形到現在的位置
     file->close();
 
-    ui->status->setText(""); // 就這樣
+    ui->status->setText("");
 }
 
 void header_downloader::on_pushButton_clicked() // browse...
@@ -103,5 +103,6 @@ void header_downloader::on_pushButton_clicked() // browse...
 
     path = QFileDialog::getExistingDirectory(this, "Choose a folder", "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->path->setText(path);
+    ui->status->setText("");
 }
 

@@ -18,8 +18,6 @@ HEADERS += \
 FORMS += \
     header_downloader.ui
 
-TRANSLATIONS += \
-    HeaderDownloader_zh_TW.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -30,3 +28,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     icons.qrc
+
+DISTFILES += \
+    ../test.rc \
+    icon.ico \
+    test.rc
+
+RC_FILE += \
+    test.rc
